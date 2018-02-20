@@ -1,6 +1,6 @@
 # async compose
 
-Compose http request handler functions left to right, like traditional "middleware". 
+Middleware-like composition of async functions for http servers
 
 ## install
 
