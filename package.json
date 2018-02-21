@@ -1,7 +1,7 @@
 {
   "name": "@nichoth/async-compose",
   "description": "Compose http request functions left to right, like traditional \"middleware\".",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "index.js",
   "scripts": {
     "preversion": "npm run lint && npm test",
