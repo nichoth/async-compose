@@ -7,7 +7,7 @@ var context = {
 
 test('.use', function (t) {
     t.plan(5)
-    Stack()
+    var stack = Stack
         .use(function (req, res, next) {
             t.equal(req.n, 1)
             t.equal(res.n, 2)
@@ -23,22 +23,38 @@ test('.use', function (t) {
             t.equal(req.n, 2)
             next()  // should do nothing if there's no more functions
         })
-        .go({ n: 1 }, { n: 2 }, context)
+
+    stack({ n: 1 }, { n: 2 }, context)
 })
+
+test('stop early', function (t) {
+    t.plan(1)
+    var stack = Stack
+        .use(function (req, res, next) {
+            t.pass('should call')
+        })
+        .use(function (req, res, next) {
+            t.fail('should not call this')
+            next()
+        })
+
+    stack({ n: 1 }, { n: 2 }, context)
+})
+
 
 test('.go', function (t) {
     t.plan(1)
-    var stack = Stack()
+    var stack = Stack
         .use(function (req, res, next) {
             t.pass('.go should return a function with the right context')
         })
 
-    stack.go()(1, 2)
+    stack()(1, 2)
 })
 
 test('concurrency', function (t) {
     t.plan(2)
-    var stack = Stack()
+    var stack = Stack
         .use(function (req, res, next) {
             t.equal(req.n, 0)
             req.n++
@@ -47,7 +63,7 @@ test('concurrency', function (t) {
             }, 10)
         })
 
-    stack.go({ n: 0 }, { n: 0 })
-    stack.go({ n: 0 }, { n: 0 })
+    stack({ n: 0 }, { n: 0 })
+    stack({ n: 0 }, { n: 0 })
 })
 

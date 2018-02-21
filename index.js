@@ -1,37 +1,35 @@
-function Stack () {
-    if (!(this instanceof Stack)) return new Stack()
-    this._fns = []
+function go (req, res, context) {
+    if (!req) {
+        var self = this
+        return function () {
+            return self.apply(self, arguments)
+        }
+    }
+    return this.first(req, res, context)
 }
 
-Stack.prototype.use = function (fn) {
-    var self = this
-
+go.use = use
+function use (fn) {
     function handler (req, res, context) {
-        fn.call(context, req, res, function () {
+        fn.call(context, req, res, function next () {
             if (handler.next) handler.next(req, res, context)
         })
     }
 
-    var prev = this._fns[this._fns.length - 1]
-    if (prev) prev.next = function (req, res, context) {
-        handler.call(self, req, res, context)
-    }
-
-    this._fns.push(handler)
-    return this
-}
-
-Stack.prototype.go = function (req, res, context) {
-    if (!req) {
-        var self = this
-        return function (_req, _res, _context) {
-            return self.go(_req, _res, _context)
+    if (!(this.first)) {
+        function _go (req, res, context) {
+            return go.apply(_go, arguments)
         }
+        _go.first = handler
+        _go.last = handler
+        _go.use = use
+        return _go
     }
 
-    this._fns[0](req, res, context)
+    this.last.next = handler
+    this.last = handler
     return this
 }
 
-module.exports = Stack
+module.exports = go
 
